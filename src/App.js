@@ -1,7 +1,6 @@
-import {useState} from 'react'
+import {useContext, useState} from 'react'
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
-import { CircularProgress, CssBaseline } from '@material-ui/core'
-import clsx from 'clsx'
+import { CssBaseline } from '@material-ui/core'
 import Navbar from './components/layout/Navbar'
 import Home from './components/pages/Home'
 import Signin from './components/auth/Signin'
@@ -10,50 +9,39 @@ import Profile from './components/auth/Profile'
 import PrivateRoute from './components/routing/PrivateRoute'
 import useStyles from './styles'
 
+import LayoutContext from './context/layout/LayoutContext'
+import AuthContextProvider from './context/auth/AuthContext'
+import NoteContextProvider from './context/note/NoteContext'
+import LayoutContextProvider from './context/layout/LayoutContext'
+
 const App = () => {
   const classes = useStyles()
-  const [open, setOpen] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(true)
-  const [uiLoading, setUiLoading] = useState(false)
-
-  const logoutUser = () => setIsAuthenticated(false)
-  const toggleDrawer = () => setOpen(!open)
-
+  
   return (
-    uiLoading ? (
-    <CircularProgress size={100} className={classes.uiProgess} />
-    ):(
-    <main
-      className={clsx(classes.content, {[classes.contentShift]: open})}
-    >
-      <CssBaseline/>
-      <Router>
-        <Navbar 
-          open={open} 
-          isAuthenticated={isAuthenticated}
-          logoutUser={logoutUser}
-          toggleDrawer={toggleDrawer}
-        />
-        <Switch>
-          <PrivateRoute 
-            exact 
-            path="/" 
-            component={Home} 
-            open={open} 
-            isAuthenticated={isAuthenticated}
-          />
-          <Route exact path="/signup" component={Signup}/>
-          <Route exact path="/signin" component={Signin}/>
-          <PrivateRoute 
-            exact 
-            path="/profile" 
-            component={Profile}
-            isAuthenticated={isAuthenticated}
-          />
-        </Switch>
-      </Router>
-    </main>
-    )
+      <LayoutContextProvider>
+        <AuthContextProvider>
+          <NoteContextProvider>
+            <CssBaseline/>
+            <Router>
+              <Navbar />
+              <Switch>
+                <PrivateRoute 
+                  exact 
+                  path="/" 
+                  component={Home} 
+                />
+                <Route exact path="/signup" component={Signup}/>
+                <Route exact path="/signin" component={Signin}/>
+                <PrivateRoute 
+                  exact 
+                  path="/profile" 
+                  component={Profile}
+                />
+              </Switch>
+            </Router>
+          </NoteContextProvider>
+        </AuthContextProvider>
+      </LayoutContextProvider>
   )
 }
 

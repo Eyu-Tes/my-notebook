@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useContext, useState} from 'react'
 import {Link} from 'react-router-dom'
 import { 
     AppBar, 
@@ -10,11 +10,14 @@ import {Menu as MenuIcon} from '@material-ui/icons'
 import clsx from 'clsx'
 import Sidebar from '../layout/Sidebar'
 import useStyles from '../../styles'
+import {AuthContext} from '../../context/auth/AuthContext'
+import {LayoutContext} from '../../context/layout/LayoutContext'
 
+const Navbar = () => {
+    const {authenticated} = useContext(AuthContext)
+    const {open, toggleDrawer} = useContext(LayoutContext)
 
-const Navbar = (props) => {
     const classes = useStyles()
-    const {isAuthenticated, logoutUser, open, toggleDrawer} = props
 
     return (
       <>
@@ -30,7 +33,7 @@ const Navbar = (props) => {
                 aria-label="open drawer"
                 onClick={toggleDrawer}
                 edge="start"
-                className={clsx(classes.menuButton, open && classes.hide, !isAuthenticated && classes.hide)}
+                className={clsx(classes.menuButton, open && classes.hide, !authenticated && classes.hide)}
             >
                 <MenuIcon />
             </IconButton>
@@ -39,12 +42,10 @@ const Navbar = (props) => {
             </Typography>
           </Toolbar>
         </AppBar>
+
         <div className={classes.offset} />
-        <Sidebar 
-            open={open} 
-            logoutUser={logoutUser}
-            toggleDrawer={toggleDrawer}
-        />  
+
+        <Sidebar />  
       </>
     )
 }

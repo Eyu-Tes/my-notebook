@@ -40,7 +40,7 @@ const Signin = () => {
     }
 
     return (
-        <Container component="main" maxWidth="xs">
+        <Container component="main" maxWidth="xs" className={classes.content}>
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}>
                     <LockOutlined/>

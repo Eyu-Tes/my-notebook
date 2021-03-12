@@ -1,3 +1,4 @@
+import {useContext} from 'react'
 import {Link as RouterLink} from 'react-router-dom'
 import {
     Avatar, 
@@ -20,9 +21,13 @@ import {
 } from '@material-ui/icons'
 import {useTheme} from '@material-ui/core/styles'
 import useStyles from '../../styles'
+import {AuthContext} from '../../context/auth/AuthContext'
+import {LayoutContext} from '../../context/layout/LayoutContext'
 
-const Sidebar = (props) => {
-    const {open, logoutUser, toggleDrawer} = props
+const Sidebar = () => {
+    const {logoutUser} = useContext(AuthContext)
+    const {open, toggleDrawer} = useContext(LayoutContext)
+
     const classes = useStyles()
     const theme = useTheme()
     const {firstName, lastName, profilePicture} = {firstName: 'Eyoab', lastName: 'Tesfaye'}
@@ -50,19 +55,10 @@ const Sidebar = (props) => {
             <div className={classes.toolbar} />
             <center>
                 <Avatar src={profilePicture} className={classes.sidebarAvatar} />
-                <h2 className={classes.title}>
-                    {' '}
-                    {firstName} {lastName}
-                </h2>
+                <h2 className={classes.title}> {' '} {firstName} {lastName} </h2>
             </center>
             <Divider />
             <List>
-                {/* <ListItem button key="Todo" onClick={toggleMainContent}>
-                    <ListItemIcon>
-                        {' '} <NotesIcon /> {' '}
-                    </ListItemIcon>
-                    <ListItemText primary="Todo" />
-                </ListItem> */}
                 <Link 
                     to="/" 
                     component={RouterLink} 

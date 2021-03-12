@@ -50,7 +50,7 @@ const Signup = () => {
     }
 
     return (
-        <Container component="main" maxWidth="xs">
+        <Container component="main" maxWidth="xs" className={classes.content}>
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}>
                     <LockOutlined/>
@@ -153,7 +153,6 @@ const Signup = () => {
                         <Grid item xs={12}>
                             <TextField
                                 variant="outlined"
-                                margin="normal"
                                 required
                                 fullWidth
                                 name="password"
