@@ -45,7 +45,7 @@ const Navbar = () => {
 
         <div className={classes.offset} />
 
-        <Sidebar />  
+        {authenticated && <Sidebar /> }  
       </>
     )
 }

@@ -16,7 +16,7 @@ import LayoutContextProvider from './context/layout/LayoutContext'
 
 const App = () => {
   const classes = useStyles()
-  
+
   return (
       <LayoutContextProvider>
         <AuthContextProvider>

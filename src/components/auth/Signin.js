@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useContext, useEffect, useState} from 'react'
 import {Link as RouterLink} from 'react-router-dom'
 import { 
     Avatar, 
@@ -12,44 +12,53 @@ import {
 } from '@material-ui/core'
 import {LockOutlined} from '@material-ui/icons'
 import useStyles from '../../styles'
+import {AuthContext} from '../../context/auth/AuthContext'
 
-const Signin = () => {
+const Signin = (props) => {
+    const {loading, authenticated, errMsg, signIn} = useContext(AuthContext)
+
     const classes = useStyles()
-
     const initialValues = {
         email: '', 
         password: '', 
-        errors: {}, 
-        loading: false
+        processing: false
     }
 
     const [values, setValues] = useState(initialValues)
+    const [errors, setErrors] = useState({})
+    // To prevent displaying the err msgs that come from other form pages (e.g. Signup)
+    const [submitted, setSubmitted] = useState(false)
+    const {email, password, processing} = values
 
-    const {email, password, errors, loading} = values
+    useEffect(() => {
+        if (authenticated) props.history.push('/')
+
+        if (errMsg && submitted) setErrors(errMsg)
+
+        // eslint-disable-next-line
+    }, [errMsg, authenticated, props.history])
+
+    const onSubmit = e => {
+        e.preventDefault()
+        setSubmitted(true)
+        signIn(email, password)
+    }
 
     const onChange = e => {
         setValues({...values, [e.target.name]: e.target.value})
     }
 
-    const onSubmit = e => {
-        e.preventDefault()
-        // setValues(initialValues)
-        const userData = {email, password}
-        console.log(userData)
-        console.log('sign in submitted')
-    }
-
     return (
+        loading ? null : (
         <Container component="main" maxWidth="xs" className={classes.content}>
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}>
                     <LockOutlined/>
                 </Avatar>
                 <Typography component="h1" variant="h5" gutterBottom={true}>Sign in</Typography>
-                <form className={classes.form} noValidate>
+                <form onSubmit={onSubmit} className={classes.form} noValidate>
                     <TextField
                         variant="outlined"
-                        margin="normal"
                         required
                         fullWidth
                         id="email"
@@ -81,13 +90,13 @@ const Signin = () => {
                         type="submit"
                         fullWidth
                         variant="contained"
+                        size="large"
                         color="primary"
                         className={classes.submit}
-                        onClick={onSubmit}
-                        disabled={loading || !email || !password}
+                        disabled={processing || !email || !password}
                     >
                         Sign In
-                        {loading && <CircularProgress size={30} className={classes.progess} />}
+                        {processing && <CircularProgress size={30} className={classes.progess} />}
                     </Button>
                     <Grid container>
                         <Grid item>
@@ -104,6 +113,7 @@ const Signin = () => {
                 </form>
             </div>
         </Container>
+        )
     )
 }
 

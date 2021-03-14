@@ -10,7 +10,8 @@ import {
     ListItem, 
     ListItemIcon, 
     ListItemText, 
-    Menu as MenuIcon 
+    Menu as MenuIcon, 
+    Typography
 } from '@material-ui/core'
 import {
     AccountBox as AccountBoxIcon, 
@@ -25,16 +26,17 @@ import {AuthContext} from '../../context/auth/AuthContext'
 import {LayoutContext} from '../../context/layout/LayoutContext'
 
 const Sidebar = () => {
-    const {logoutUser} = useContext(AuthContext)
+    const {user: {displayName}, signOut} = useContext(AuthContext)
     const {open, toggleDrawer} = useContext(LayoutContext)
 
     const classes = useStyles()
     const theme = useTheme()
-    const {firstName, lastName, profilePicture} = {firstName: 'Eyoab', lastName: 'Tesfaye'}
+
+    const profilePicture = ''
     
     const onLogout = () => {
         toggleDrawer()
-        logoutUser()
+        signOut()
     }
 
     return (
@@ -55,7 +57,13 @@ const Sidebar = () => {
             <div className={classes.toolbar} />
             <center>
                 <Avatar src={profilePicture} className={classes.sidebarAvatar} />
-                <h2 className={classes.title}> {' '} {firstName} {lastName} </h2>
+                <Typography 
+                    variant="h6"
+                    noWrap={true}
+                    className={classes.title}
+                > 
+                   <b> {' '} {displayName} </b>
+                </Typography>
             </center>
             <Divider />
             <List>

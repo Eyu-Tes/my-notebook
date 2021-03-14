@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useContext, useEffect, useState} from 'react'
 import {Link as RouterLink} from 'react-router-dom'
 import { 
     Avatar, 
@@ -12,44 +12,69 @@ import {
 } from '@material-ui/core'
 import {LockOutlined} from '@material-ui/icons'
 import useStyles from '../../styles'
+import {AuthContext} from '../../context/auth/AuthContext'
 
-const Signup = () => {
+const Signup = ({history}) => {
+    const {loading, authenticated, errMsg, signUp} = useContext(AuthContext)
+
     const classes = useStyles()
-
     const initialValues = {
-        firstName: '',
-        lastName: '',
-        phoneNumber: '',
-        country: '',
-        username: '',
+        displayName: '',
         email: '',
+        firstName: '', 
+        lastName: '',
         password: '',
         password2: '',
-        errors: {},
-        loading: false
+        processing: false
     }
 
     const [values, setValues] = useState(initialValues)
+    const [errors, setErrors] = useState({})
+    // To prevent displaying the err msgs that come from other form pages (e.g. Signin)
+    const [submitted, setSubmitted] = useState(false)
+    const {displayName, email, firstName, lastName, password, password2, processing} = values
 
-    const {
-        firstName, lastName, phoneNumber, country, username, email, password, password2, errors, loading
-    } = values
+    useEffect(() => {
+        if (authenticated)
+            history.push('/')
+
+        if (errMsg && submitted)
+            setErrors(errMsg)
+
+        // eslint-disable-next-line
+    }, [errMsg, authenticated, history])
+
+    const validate = () => {
+        let valid = true
+        const err = {}
+        if (password !== password2) {
+            valid = false
+            err.password2 = "Passwords do not match"
+        }
+        if (password.length < 6) {
+            valid = false
+            err.password = "Password should be at least 6 characters"
+            delete err.password2
+        }
+        setErrors(err)
+        return valid
+    }
+
+    const onSubmit = e => {
+        e.preventDefault()
+        if (validate()) {
+            const data = {displayName, email, firstName, lastName, password}
+            setSubmitted(true)
+            signUp(data)
+        }
+    }
 
     const onChange = e => {
         setValues({...values, [e.target.name]: e.target.value})
     }
 
-    const onSubmit = e => {
-        e.preventDefault()
-        // setValues(initialValues)
-        const newUserData = {
-            firstName, lastName, phoneNumber, country, username, email, password, password2, errors, loading
-        }
-        console.log(newUserData)
-        console.log('sign up submitted')
-    }
-
     return (
+        !loading && (
         <Container component="main" maxWidth="xs" className={classes.content}>
             <div className={classes.paper}>
                 <Avatar className={classes.avatar}>
@@ -58,37 +83,6 @@ const Signup = () => {
                 <Typography component="h1" variant="h5" gutterBottom={true}>Sign up</Typography>
                 <form onSubmit={onSubmit} className={classes.form} noValidate>
                     <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                variant="outlined"
-                                required
-                                fullWidth
-                                id="firstName"
-                                label="First Name"
-                                name="firstName"
-                                autoComplete="firstName"
-                                autoFocus
-                                helperText={errors.firstName}
-                                error={errors.firstName ? true : false}
-                                value={firstName}
-                                onChange={onChange}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                variant="outlined"
-                                required
-                                fullWidth
-                                id="lastName"
-                                label="Last Name"
-                                name="lastName"
-                                autoComplete="lastName"
-                                helperText={errors.lastName}
-                                error={errors.lastName ? true : false}
-                                value={lastName}
-                                onChange={onChange}
-                            />
-                        </Grid>
                         <Grid item xs={12} sm={6}>
                             <TextField
                                 variant="outlined"
@@ -109,13 +103,13 @@ const Signup = () => {
                                 variant="outlined"
                                 required
                                 fullWidth
-                                id="username"
+                                id="displayName"
                                 label="User Name"
-                                name="username"
-                                autoComplete="username"
-                                helperText={errors.username}
-                                error={errors.username ? true : false}
-                                value={username}
+                                name="displayName"
+                                autoComplete="displayName"
+                                helperText={errors.displayName}
+                                error={errors.displayName ? true : false}
+                                value={displayName}
                                 onChange={onChange}
                             />
                         </Grid>
@@ -124,14 +118,12 @@ const Signup = () => {
                                 variant="outlined"
                                 required
                                 fullWidth
-                                id="phoneNumber"
-                                label="Phone Number"
-                                name="phoneNumber"
-                                autoComplete="phoneNumber"
-                                pattern="[7-9]{1}[0-9]{9}"
-                                helperText={errors.phoneNumber}
-                                error={errors.phoneNumber ? true : false}
-                                value={phoneNumber}
+                                id="firstName"
+                                label="First Name"
+                                name="firstName"
+                                autoComplete="firstName"
+                                helperText={errors.firstName}
+                                error={errors.firstName ? true : false}
                                 onChange={onChange}
                             />
                         </Grid>
@@ -140,13 +132,12 @@ const Signup = () => {
                                 variant="outlined"
                                 required
                                 fullWidth
-                                id="country"
-                                label="Country"
-                                name="country"
-                                autoComplete="country"
-                                helperText={errors.country}
-                                error={errors.country ? true : false}
-                                value={country}
+                                id="lastName"
+                                label="Last Name"
+                                name="lastName"
+                                autoComplete="lastName"
+                                helperText={errors.lastName}
+                                error={errors.lastName ? true : false}
                                 onChange={onChange}
                             />
                         </Grid>
@@ -176,6 +167,8 @@ const Signup = () => {
                                 type="password"
                                 id="password2"
                                 autoComplete="current-password"
+                                helperText={errors.password2}
+                                error={errors.password2 ? true : false}
                                 value={password2}
                                 onChange={onChange}
                             />
@@ -185,20 +178,19 @@ const Signup = () => {
                         type="submit"
                         fullWidth
                         variant="contained"
+                        size="large"
                         color="primary"
                         className={classes.submit}
-                        disabled={loading || 
+                        disabled={processing || 
+                            !email || 
+                            !displayName ||
                             !firstName ||
                             !lastName ||
-                            !username ||
-                            !phoneNumber ||
-                            !email || 
-                            !country ||
                             !password ||
                             !password2}
                     >
                         Sign Up
-                        {loading && <CircularProgress size={30} className={classes.progess} />}
+                        {processing && <CircularProgress size={30} className={classes.progess} />}
                     </Button>
                     <Grid container justify="flex-end">
                         <Grid item>
@@ -210,6 +202,8 @@ const Signup = () => {
                 </form>
             </div>
         </Container>
+        )
+        
     )
 }
 

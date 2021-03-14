@@ -1,23 +1,41 @@
-import {createContext, useState} from 'react'
+import {createContext, useContext, useEffect, useState} from 'react'
+import {firestore} from '../../config/firebase'
+import {AuthContext} from '../../context/auth/AuthContext'
 
 export const NoteContext = createContext()
 
-const noteList = [
-    {id: 1, title: 'eyu', body: 'eyoab tesfaye', createdAt: new Date('2021-03-10 12:34:16')}, 
-    {id: 2, title: 'blen', body: 'blen tesfaye', createdAt: new Date('2018-08-08')}, 
-    {id: 3, title: 'tt', body: 'mam tiruneh', createdAt: new Date('2018-08-08')}, 
-    {id: 4, title: 'paps', body: 'tesfaye aregay', createdAt: new Date('2018-08-08')}, 
-    {id: 5, title: 'dico', body: 'dd @gmail.com', createdAt: new Date('2018-08-08')}, 
-    {id: 6, title: 'pop', body: 'pipoye pipoye', createdAt: new Date('2018-08-08')}
-]
+const notesRef = firestore.collection('notes')
 
 const NoteContextProvider = (props) => {
-    const [notes, setNotes] = useState(noteList)
+    const {loading, user} = useContext(AuthContext)
+
+    const [notes, setNotes] = useState([])
     const [current, setCurrent] = useState(null)
     const [formOpened, setFormOpened] = useState(false)
     const [detailOpened, setDetailOpened] = useState(false)
     const [confirmOpened, setConfirmOpened] = useState(false)
     
+    const getNotes = async () => {
+        try {
+            await notesRef
+            .where("author", "==", user.uid)
+            .orderBy('createdAt', 'desc')
+            .onSnapshot(querySnapshot => {
+                const items = []
+                querySnapshot.forEach(doc => {
+                    items.push({id: doc.id, ... doc.data()})
+                })
+                setNotes(items)
+            })
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    const clearNotes = () => {
+        setNotes([])
+    }
+
     const setCurrentNote = (id) => {
         const note = notes.find(note => note.id === id)
         setCurrent(note)
@@ -27,24 +45,34 @@ const NoteContextProvider = (props) => {
         setCurrent(null)
     }
 
-    const getLastId = () => {
-        const lastNote = notes[notes.length - 1]
-        const id = lastNote ? lastNote.id : 0
-        return id
+    const createNote = async (note) => {
+        const newNote = {
+            ...note, 
+            createdAt: new Date(), 
+            author: user.uid
+        }
+        try {
+            await notesRef.add(newNote)
+        } catch (err) {
+            console.log(err)
+        }
     }
 
-    const createNote = (note) => {
-        note.id = getLastId() + 1
-        note.createdAt = new Date()
-        setNotes([...notes, note])
+    const updateNote = async (updatedNote) => {
+        try {
+            const docId = updatedNote.id
+            await notesRef.doc(docId).update(updatedNote)
+        } catch (err) {
+            console.log(err)
+        }
     }
 
-    const updateNote = (updatedNote) => {
-        setNotes(notes.map(note => note.id === updatedNote.id ? updatedNote : note))
-    }
-
-    const deleteNote = (id) => {
-        setNotes(notes.filter(note => note.id !== id))
+    const deleteNote = async (id) => {
+        try {
+            await notesRef.doc(id).delete()
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     const handleFormOpen = (id) => {
@@ -77,6 +105,16 @@ const NoteContextProvider = (props) => {
         clearCurrentNote(true)
     }
 
+    useEffect(() => {
+        if (!loading && user) {
+            getNotes()
+        }
+        // Removes the notes that belong to previoud loggedin user
+        if(!user) {
+            clearNotes()
+        }
+    }, [loading, user])
+
     return (
         <NoteContext.Provider value={{
             notes, 
@@ -84,6 +122,7 @@ const NoteContextProvider = (props) => {
             formOpened, 
             detailOpened, 
             confirmOpened, 
+            getNotes, 
             setCurrentNote, 
             clearCurrentNote, 
             createNote, 
