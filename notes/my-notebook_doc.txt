@@ -1,0 +1,45 @@
+App: notebook
+
+Technologies: React.js + Firebase 
+	(firebase authentication + firebase cloud firestore + firebase cloud storage + firebase cloud functions)
+	- firebase authentication = identify user
+	- firebase cloud firestore = noSQL DB
+	- firebase cloud storage = store & serve user generated content
+	* cancelled due to "not free plan" - cloud functions
+	- firebase cloud functions = run backend code in response to events triggered by Firebase features and HTTPS requests
+
+Requirements:
+	- authenticaiton (signin , signup, signout, forgot password, supdate profile)
+	- list notes
+	- search note (by category - optional)
+	- add note (specify category - optional)
+	- edit note
+	- delete note
+	
+Design: 
+	* Components:	
+		|layout: 
+			- Navbar
+			- Footer
+			- Spinner
+			- Alert
+			- DeleteModal
+		|pages:
+			- Home 
+			- About
+			- Contact
+			- NotFound
+		|note:
+			- Notes
+			- NoteItem
+			- Note
+			- SearchNote
+		|auth: 
+			- Signup
+			- Signin
+			- Profile
+			- ChangePassword
+			- ForgotPassword
+			- PrivateRoute
+
+Deployment: netlify

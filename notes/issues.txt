@@ -1,0 +1,14 @@
++ rendering of components before the state has been set. 
+    - use loading && (<ComponentToBeRendered/>)
+
++ useEffect to set state by depending on the values of other states.
+    - like componentDidUpdate
+    - useEffect(() => {
+        // change state here
+    }, [valueToBeTracked])
+
++ useEffect inside context is possible.
+    - yes, because it is also a component
+
++ firestore create index for, "where" query. 
+    - follow the link in the console error to create link in firebase website
