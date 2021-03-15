@@ -1,4 +1,4 @@
-import {makeStyles} from '@material-ui/core/styles'
+import {fade, makeStyles} from '@material-ui/core/styles'
 
 const drawerWidth = 240
 
@@ -6,7 +6,7 @@ const useStyles = makeStyles((theme) => ({
     // App
     content: {
         flexGrow: 1,
-        padding: theme.spacing(3),
+        padding: theme.spacing(1.5),
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
         left: '45%',
         top: '35%'
     },
-    // Todos
+    // Notes
     pos: {
 		marginBottom: 12
 	},
@@ -58,6 +58,17 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.error.main, 
         display: 'flex',
         alignItems: 'center'
+    },
+    // Notes Filter
+    filterContainer: {
+        "&:last-child": {
+          paddingBottom: theme.spacing(2)
+        }
+    },
+    textFieldNoBorder: {
+        [`& fieldset`]: {
+          borderRadius: 0,
+        },
     },
     // Sign In, Sign Up, Profile
     paper: {

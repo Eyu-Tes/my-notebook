@@ -10,6 +10,7 @@ const NoteContextProvider = (props) => {
     const {loading, user} = useContext(AuthContext)
 
     const [notes, setNotes] = useState([])
+    const [filtered, setFiltered] = useState(null)
     const [current, setCurrent] = useState(null)
     const [formOpened, setFormOpened] = useState(false)
     const [detailOpened, setDetailOpened] = useState(false)
@@ -34,6 +35,14 @@ const NoteContextProvider = (props) => {
 
     const clearNotes = () => {
         setNotes([])
+    }
+
+    const filterNotes = (text) => {
+        setFiltered(notes.filter(note => note.title.match(new RegExp(text.trim(), 'gi'))))
+    }
+
+    const clearFilter = () => {
+        setFiltered(null)
     }
 
     const setCurrentNote = (id) => {
@@ -118,11 +127,14 @@ const NoteContextProvider = (props) => {
     return (
         <NoteContext.Provider value={{
             notes, 
+            filtered,
             current, 
             formOpened, 
             detailOpened, 
             confirmOpened, 
             getNotes, 
+            filterNotes, 
+            clearFilter,
             setCurrentNote, 
             clearCurrentNote, 
             createNote, 
