@@ -133,8 +133,8 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'flex-end',
     }, 
     sidebarAvatar: {
-        height: 90,
-        width: 90,
+        height: 110,
+        width: 110,
         flexShrink: 0,
         flexGrow: 0,
         margin: (0)

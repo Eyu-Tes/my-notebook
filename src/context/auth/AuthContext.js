@@ -1,5 +1,5 @@
 import {createContext, useEffect, useState} from 'react'
-import {auth, firestore} from '../../config/firebase'
+import {auth, firestore, storage} from '../../config/firebase'
 
 export const AuthContext = createContext()
 
@@ -10,6 +10,7 @@ const AuthContextProvider = ({children}) => {
     const [authenticated, setAuthenticated] = useState(false)
     const [user, setUser] = useState(null)
     const [userInfo, setUserInfo] = useState(null)
+    const [profilePic, setProfilePic] = useState('')
     const [errMsg, setErrMsg] = useState(null)
 
     const loadUser = async () => {
@@ -31,6 +32,16 @@ const AuthContextProvider = ({children}) => {
         try {
             const doc = await usersRef.doc(user.uid).get()
             setUserInfo(doc.data())
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    const getProfilePicture = async () => {
+        try {
+            const storageRef = storage.ref(`${user.photoURL}`)
+            const imgUrl = await storageRef.getDownloadURL()
+            setProfilePic(imgUrl)
         } catch (err) {
             console.log(err)
         }
@@ -105,12 +116,30 @@ const AuthContextProvider = ({children}) => {
         }
     }
 
+    const uploadImage = async (img) => {
+        try {
+            const patt = /[^.]+$/
+            const ext = img.name.match(patt)[0]
+            const imgName = `profile.${ext}`
+            const path = `users/${user.uid}/${imgName}`
+            const storageRef = storage.ref(path)
+            await storageRef.put(img)
+            await auth.currentUser.updateProfile({photoURL: path})
+            loadUser()
+            getProfilePicture()
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
     useEffect(() => {
         loadUser()
 
-        if(user) {
+        if (user) {
             getUserInfo()
+            getProfilePicture()
         }
+
     }, [user])
 
     return (
@@ -118,6 +147,7 @@ const AuthContextProvider = ({children}) => {
             authenticated,
             user, 
             userInfo,
+            profilePic,
             errMsg,
             loading,
             loadUser,
@@ -125,7 +155,8 @@ const AuthContextProvider = ({children}) => {
             signIn,
             signOut, 
             updateAuthProfile,
-            updateUserInfo
+            updateUserInfo, 
+            uploadImage
         }}>
             {children}
         </AuthContext.Provider>

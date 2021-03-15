@@ -19,7 +19,7 @@ import {AuthContext} from '../../context/auth/AuthContext'
 import {LayoutContext} from '../../context/layout/LayoutContext'
 
 const Profile = () => {
-    const {user, userInfo, updateAuthProfile, updateUserInfo} = useContext(AuthContext)
+    const {user, userInfo, updateAuthProfile, updateUserInfo, uploadImage} = useContext(AuthContext)
     const {open} = useContext(LayoutContext)
     
     const classes = useStyles()
@@ -35,11 +35,26 @@ const Profile = () => {
         setValues({...values, ...userInfo})
     }, [userInfo]) 
 
+    const checkExt = (file) => {
+        setImageError(false)
+        let valid = true
+        const ext = file.name.match(/[^.]+$/)[0].toLowerCase()
+        if (ext !== 'png' && ext !== 'jpg') {
+            valid = false
+            setImageError(true)
+        }
+        return valid
+    }
+
     const profilePictureHandler = () => {
-        console.log('Photo Uploaded')
+        if (profilePicture) {
+            uploadImage(profilePicture)
+            setProfilePicture('')
+        }
     }
     const handleImageChange = e => {
-        setProfilePicture(e.target.files[0])
+        const file = e.target.files[0]
+        checkExt(file) ? setProfilePicture(file) : setProfilePicture('')
     }
     const updateFormValues = e => {
         e.preventDefault()

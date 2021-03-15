@@ -26,13 +26,11 @@ import {AuthContext} from '../../context/auth/AuthContext'
 import {LayoutContext} from '../../context/layout/LayoutContext'
 
 const Sidebar = () => {
-    const {user: {displayName}, signOut} = useContext(AuthContext)
+    const {user: {displayName}, profilePic, signOut} = useContext(AuthContext)
     const {open, toggleDrawer} = useContext(LayoutContext)
 
     const classes = useStyles()
     const theme = useTheme()
-
-    const profilePicture = ''
     
     const onLogout = () => {
         toggleDrawer()
@@ -56,7 +54,7 @@ const Sidebar = () => {
             </div>
             <div className={classes.toolbar} />
             <center>
-                <Avatar src={profilePicture} className={classes.sidebarAvatar} />
+                <Avatar src={profilePic} className={classes.sidebarAvatar} />
                 <Typography 
                     variant="h6"
                     noWrap={true}

@@ -1,6 +1,7 @@
 import firebase from 'firebase/app'
-import 'firebase/firestore'
 import 'firebase/auth'
+import 'firebase/firestore'
+import 'firebase/storage'
 import "firebase/analytics"
 
 const config = {
@@ -26,3 +27,6 @@ export const auth = firebase.auth()
 
 // initialize firestore instance
 export const firestore = firebase.firestore() 
+
+// initialize storage instance
+export const storage = firebase.storage()
