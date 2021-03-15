@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
             marginLeft: drawerWidth,
         }
     },
-    uiProgess: {
+    uiProgress: {
         position: 'fixed',
         zIndex: '1000',
         left: '45%',
@@ -75,14 +75,15 @@ const useStyles = makeStyles((theme) => ({
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center', 
+        margin: theme.spacing(3, 0),
 	}, 
     avatar: {
 		backgroundColor: theme.palette.secondary.main, 
-        marginBottom: theme.spacing(1)
+        marginBottom: theme.spacing(1.5)
 	},
     form: {
 		width: '100%', // Fix IE 11 issue.
-        marginTop: theme.spacing(1.5)
+        marginTop: theme.spacing(2.5)
 	},
 	submit: {
 		margin: theme.spacing(3, 0, 2)
@@ -152,6 +153,10 @@ const useStyles = makeStyles((theme) => ({
     },
     title: {
         margin: theme.spacing(3, 1)
+    },
+    // alert
+    alert: {
+        margin: theme.spacing(0, 0, 2.5)
     }
 }))
 

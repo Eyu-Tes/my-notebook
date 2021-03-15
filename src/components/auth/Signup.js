@@ -10,12 +10,13 @@ import {
     TextField,
     Typography
 } from '@material-ui/core'
+import {Alert} from '@material-ui/lab'
 import {LockOutlined} from '@material-ui/icons'
 import useStyles from '../../styles'
 import {AuthContext} from '../../context/auth/AuthContext'
 
 const Signup = ({history}) => {
-    const {loading, authenticated, errMsg, signUp} = useContext(AuthContext)
+    const {loading, authenticated, errMsg, signUp, processing} = useContext(AuthContext)
 
     const classes = useStyles()
     const initialValues = {
@@ -25,14 +26,13 @@ const Signup = ({history}) => {
         lastName: '',
         password: '',
         password2: '',
-        processing: false
     }
 
     const [values, setValues] = useState(initialValues)
     const [errors, setErrors] = useState({})
     // To prevent displaying the err msgs that come from other form pages (e.g. Signin)
     const [submitted, setSubmitted] = useState(false)
-    const {displayName, email, firstName, lastName, password, password2, processing} = values
+    const {displayName, email, firstName, lastName, password, password2} = values
 
     useEffect(() => {
         if (authenticated)
@@ -81,7 +81,11 @@ const Signup = ({history}) => {
                     <LockOutlined/>
                 </Avatar>
                 <Typography component="h1" variant="h5" gutterBottom={true}>Sign up</Typography>
+                {errors.nonField}
                 <form onSubmit={onSubmit} className={classes.form} noValidate>
+                    {errors.nonField && (
+                        <Alert severity="error" className={classes.alert}>{errors.nonField}</Alert>
+                    )}
                     <Grid container spacing={2}>
                         <Grid item xs={12} sm={6}>
                             <TextField
@@ -92,6 +96,7 @@ const Signup = ({history}) => {
                                 label="Email Address"
                                 name="email"
                                 autoComplete="email"
+                                autoFocus
                                 helperText={errors.email}
                                 error={errors.email ? true : false}
                                 value={email}

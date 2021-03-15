@@ -10,25 +10,25 @@ import {
     TextField,
     Typography
 } from '@material-ui/core'
+import {Alert} from '@material-ui/lab'
 import {LockOutlined} from '@material-ui/icons'
 import useStyles from '../../styles'
 import {AuthContext} from '../../context/auth/AuthContext'
 
 const Signin = (props) => {
-    const {loading, authenticated, errMsg, signIn} = useContext(AuthContext)
+    const {loading, authenticated, errMsg, signIn, processing} = useContext(AuthContext)
 
     const classes = useStyles()
     const initialValues = {
         email: '', 
         password: '', 
-        processing: false
     }
 
     const [values, setValues] = useState(initialValues)
     const [errors, setErrors] = useState({})
     // To prevent displaying the err msgs that come from other form pages (e.g. Signup)
     const [submitted, setSubmitted] = useState(false)
-    const {email, password, processing} = values
+    const {email, password} = values
 
     useEffect(() => {
         if (authenticated) props.history.push('/')
@@ -57,6 +57,9 @@ const Signin = (props) => {
                 </Avatar>
                 <Typography component="h1" variant="h5" gutterBottom={true}>Sign in</Typography>
                 <form onSubmit={onSubmit} className={classes.form} noValidate>
+                    {errors.nonField && (
+                        <Alert severity="error" className={classes.alert}>{errors.nonField}</Alert>
+                    )}
                     <TextField
                         variant="outlined"
                         required
@@ -101,7 +104,7 @@ const Signin = (props) => {
                     <Grid container>
                         <Grid item>
                             <Link to="/signup" component={RouterLink}>
-                                {"Don't have an account? Sign Up"}
+                                {"Don't have an account? Sign up"}
                             </Link>
                         </Grid>
                     </Grid>

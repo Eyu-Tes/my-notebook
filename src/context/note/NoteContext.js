@@ -1,6 +1,8 @@
 import {createContext, useContext, useEffect, useState} from 'react'
+import { CircularProgress } from '@material-ui/core'
 import {firestore} from '../../config/firebase'
 import {AuthContext} from '../../context/auth/AuthContext'
+import useStyles from '../../styles'
 
 export const NoteContext = createContext()
 
@@ -16,6 +18,8 @@ const NoteContextProvider = (props) => {
     const [detailOpened, setDetailOpened] = useState(false)
     const [confirmOpened, setConfirmOpened] = useState(false)
     
+    const classes = useStyles()
+
     const getNotes = async () => {
         try {
             await notesRef
@@ -125,6 +129,8 @@ const NoteContextProvider = (props) => {
     }, [loading, user])
 
     return (
+		loading ? 
+        <CircularProgress size={150} className={classes.uiProgress} /> :
         <NoteContext.Provider value={{
             notes, 
             filtered,

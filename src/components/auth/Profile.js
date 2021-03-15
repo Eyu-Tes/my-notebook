@@ -12,6 +12,7 @@ import {
     Typography
 } from "@material-ui/core"
 import { CloudUpload as CloudUploadIcon } from '@material-ui/icons'
+import {Alert} from '@material-ui/lab'
 import clsx from 'clsx'
 import useStyles from '../../styles'
 
@@ -19,21 +20,31 @@ import {AuthContext} from '../../context/auth/AuthContext'
 import {LayoutContext} from '../../context/layout/LayoutContext'
 
 const Profile = () => {
-    const {user, userInfo, updateAuthProfile, updateUserInfo, uploadImage} = useContext(AuthContext)
+    const {
+        user, 
+        userInfo, 
+        errMsg,
+        updateEmail,
+        updateAuthProfile, 
+        updateUserInfo, 
+        uploadImage, 
+        processing
+    } = useContext(AuthContext)
     const {open} = useContext(LayoutContext)
     
     const classes = useStyles()
 
     const [values, setValues] = useState({...user, ...userInfo})
     const [profilePicture, setProfilePicture] = useState('')
+    const [errors, setErrors] = useState({})
     const [imageError, setImageError] = useState(false)
-    const [buttonLoading, setButtonLoading] = useState(false)
 
     const {uid, email, displayName, firstName, lastName, phone, country} = values
     
     useEffect(() => {
         setValues({...values, ...userInfo})
-    }, [userInfo]) 
+        if (errMsg) setErrors(errMsg)
+    }, [userInfo, errMsg]) 
 
     const checkExt = (file) => {
         setImageError(false)
@@ -58,6 +69,9 @@ const Profile = () => {
     }
     const updateFormValues = e => {
         e.preventDefault()
+        if (user.email !== email) {
+            updateEmail(email)
+        } 
         if (user.displayName !== displayName) {
             updateAuthProfile(displayName)
         }
@@ -80,6 +94,9 @@ const Profile = () => {
       userInfo && (
         <main className={clsx(classes.content, {[classes.contentShift]: open})}>
             <Container componenet="main" maxWidth="md" disableGutters={true}>
+                {errors.nonField && (
+                    <Alert severity="error" className={classes.alert}>{errors.nonField}</Alert>
+                )}
                 <Card className={clsx(classes.root, classes)}>
                     <CardContent>
                         <Typography gutterBottom variant="h4">
@@ -93,14 +110,18 @@ const Profile = () => {
                             startIcon={<CloudUploadIcon />}
                             className={classes.uploadButton}
                             onClick={profilePictureHandler}
+                            disabled={processing}
                         >
                             Upload Photo
+                            {processing && 
+                                <CircularProgress size={25} className={classes.progess} />
+                            }
                         </Button>
                         <input type="file" onChange={handleImageChange} />
                         {imageError && (
                             <div className={classes.customError}>
                                 {' '}
-                                Wrong Image Format || Supported Format are PNG and JPG
+                                Wrong Image Format || Supported Formats are PNG and JPG
                             </div>
                         )}
                     </CardContent>
@@ -119,9 +140,10 @@ const Profile = () => {
                                         margin="dense"
                                         name="email"
                                         variant="outlined"
-                                        disabled={true}
+                                        helperText={errors.email}
+                                        error={errors.email ? true : false}
                                         value={email}
-                                        // onChange={handleChange}
+                                        onChange={handleChange}
                                     />
                                 </Grid>
                                 <Grid item sm={6} xs={12}>
@@ -192,14 +214,14 @@ const Profile = () => {
                         variant="contained"
                         type="submit"
                         disabled={
-                            buttonLoading || 
+                            processing || 
                             !displayName ||
                             !firstName ||
                             !lastName
                         }
                     >
                         Save details
-                        {buttonLoading && 
+                        {processing && 
                             <CircularProgress size={25} className={classes.progess} />
                         }
                     </Button>
